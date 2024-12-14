@@ -1,9 +1,18 @@
 import os
 import streamlit as st
 import google.generativeai as genai
+from dotenv import load_dotenv
 
-# Set API key (Remember to replace with your actual API key)
-genai.configure(api_key="AIzaSyDbC3j5D7q1i3D2L_V9gt5zvnojVw_6I5k")
+# Load environment variables from the .env file
+load_dotenv()
+
+# Get the API key from the environment variable
+api_key = os.getenv("GOOGLE_API_KEY")
+if not api_key:
+    st.error("API key not found. Please set it in the .env file.")
+else:
+    # Set API key
+    genai.configure(api_key=api_key)
 
 # Create the model
 generation_config = {
@@ -33,8 +42,9 @@ st.markdown(
         border-radius: 15px;
         margin: 10px 0;
         max-width: 70%;
-        display: flex;
-        align-items: center;
+        display: inline-block;
+        word-wrap: break-word; /* Ensures long words or URLs break to the next line */
+        white-space: normal;   /* Allows text to wrap properly within the bubble */
     }}
     .user-bubble {{
         background-color: #F0F0F0;
