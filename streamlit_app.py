@@ -95,6 +95,10 @@ st.markdown(
 # Title
 st.markdown("<div class='title'>IB Biology Tutor</div>", unsafe_allow_html=True)
 
+# Track the last selected topic to avoid duplicate entries
+if "last_selected_topic" not in st.session_state:
+    st.session_state.last_selected_topic = ""
+
 # Dropdown Box for IB Topics
 topics = [
     "A1.1 Water", "A1.2 Nucleic acids", "A2.1 Origins of cells [HL]",
@@ -120,6 +124,13 @@ selected_topic = st.selectbox(
     "Not sure what to study? Click here to see the list of topics!", [""] + topics
 )
 
+# Check if the selected topic has changed and only process it once
+if selected_topic and selected_topic != st.session_state.last_selected_topic:
+    st.session_state.chat_session.history.append({"role": "user", "parts": [{"text": selected_topic}]})
+    response = st.session_state.chat_session.send_message(selected_topic)
+    st.session_state.chat_session.history.append({"role": "model", "parts": [{"text": response.text}]})
+    st.session_state.last_selected_topic = selected_topic  # Update to prevent duplicates
+
 # Set up user icon and tutor icon
 user_icon = "https://e7.pngegg.com/pngimages/168/827/png-clipart-computer-icons-user-profile-avatar-profile-woman-desktop-wallpaper-thumbnail.png"  # Placeholder for user icon
 tutor_icon = "https://cdn2.iconfinder.com/data/icons/social-media-agency-dazzle-vol-1/256/Bot-512.png"    # Placeholder for tutor icon
@@ -131,12 +142,6 @@ if "chat_session" not in st.session_state:
                 {"role": "model", "parts": [{"text": "Good afternoon! I'm here to help with your IB Biology review."}]},
         ]
     )
-
-# If a topic is selected, simulate user input
-if selected_topic:
-    st.session_state.chat_session.history.append({"role": "user", "parts": [{"text": selected_topic}]})
-    response = st.session_state.chat_session.send_message(selected_topic)
-    st.session_state.chat_session.history.append({"role": "model", "parts": [{"text": response.text}]})
 
 # Display chat history
 chat_placeholder = st.empty()
