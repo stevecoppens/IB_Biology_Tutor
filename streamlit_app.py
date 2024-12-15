@@ -93,32 +93,35 @@ st.markdown(
 )
 
 # Title
-st.markdown("<div class='title'>IB Biology Tutor</div>", unsafe_allow_html=True)
+st.markdown("<div class='title'>AP Environmental Science Tutor</div>", unsafe_allow_html=True)
 
-# Dropdown Box for IB Topics
+# Track the last selected topic to avoid duplicate entries
+if "last_selected_topic" not in st.session_state:
+    st.session_state.last_selected_topic = ""
+
+# Dropdown Box for APES Topics
 topics = [
-    "A1.1 Water", "A1.2 Nucleic acids", "A2.1 Origins of cells [HL]",
-    "A2.2 Cell structure", "A2.3 Viruses [HL]", "A3.1 Diversity of organisms",
-    "A3.2 Classification and cladistics [HL]", "A4.1 Evolution and speciation",
-    "A4.2 Conservation of biodiversity", "B1.1 Carbohydrates and lipids",
-    "B1.2 Proteins", "B2.1 Membranes and membrane transport",
-    "B2.2 Organelles and compartmentalization", "B2.3 Cell specialization",
-    "B3.1 Gas exchange", "B3.2 Transport", "B3.3 Muscle and motility [HL]",
-    "B4.1 Adaptation to environment", "B4.2 Ecological niches",
-    "C1.1 Enzymes and metabolism", "C1.2 Cell respiration",
-    "C1.3 Photosynthesis", "C2.1 Chemical signaling", "C2.2 Neural signaling",
-    "C3.1 Integration of body systems", "C3.2 Defense against disease",
-    "C4.1 Populations and communities", "C4.2 Transfers of energy and matter",
-    "D1.1 DNA replication", "D1.2 Protein synthesis",
-    "D1.3 Mutation and gene editing", "D2.1 Cell and nuclear division",
-    "D2.2 Gene expression [HL]", "D2.3 Water potential", "D3.1 Reproduction",
-    "D3.2 Inheritance", "D3.3 Homeostasis", "D4.1 Natural selection",
-    "D4.2 Stability and change", "D4.3 Climate change"
+    "Unit 1: The Living World: Ecosystems",
+    "Unit 2: The Living World: Biodiversity",
+    "Unit 3: Populations",
+    "Unit 4: Earth Systems and Resources",
+    "Unit 5: Land and Water Use",
+    "Unit 6: Energy Resources and Consumption",
+    "Unit 7: Atmospheric Pollution",
+    "Unit 8: Aquatic and Terrestrial Pollution",
+    "Unit 9: Global Change",
 ]
 
 selected_topic = st.selectbox(
     "Not sure what to study? Click here to see the list of topics!", [""] + topics
 )
+
+# Check if the selected topic has changed and only process it once
+if selected_topic and selected_topic != st.session_state.last_selected_topic:
+    st.session_state.chat_session.history.append({"role": "user", "parts": [{"text": selected_topic}]})
+    response = st.session_state.chat_session.send_message(selected_topic)
+    st.session_state.chat_session.history.append({"role": "model", "parts": [{"text": response.text}]})
+    st.session_state.last_selected_topic = selected_topic  # Update to prevent duplicates
 
 # Set up user icon and tutor icon
 user_icon = "https://e7.pngegg.com/pngimages/168/827/png-clipart-computer-icons-user-profile-avatar-profile-woman-desktop-wallpaper-thumbnail.png"  # Placeholder for user icon
@@ -128,15 +131,9 @@ tutor_icon = "https://cdn2.iconfinder.com/data/icons/social-media-agency-dazzle-
 if "chat_session" not in st.session_state:
     st.session_state.chat_session = model.start_chat(
         history=[
-                {"role": "model", "parts": [{"text": "Good afternoon! I'm here to help with your IB Biology review."}]},
+                {"role": "model", "parts": [{"text": "Good afternoon! I'm here to help with your APES review."}]},
         ]
     )
-
-# If a topic is selected, simulate user input
-if selected_topic:
-    st.session_state.chat_session.history.append({"role": "user", "parts": [{"text": selected_topic}]})
-    response = st.session_state.chat_session.send_message(selected_topic)
-    st.session_state.chat_session.history.append({"role": "model", "parts": [{"text": response.text}]})
 
 # Display chat history
 chat_placeholder = st.empty()
